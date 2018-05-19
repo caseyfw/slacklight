@@ -43,7 +43,7 @@ ESP8266WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
 
 unsigned long lastPing = 0;
-unsigned long pingId = 1;
+unsigned long pingId = 0;
 bool connected = false;
 unsigned long alarmEpoch = 0;
 unsigned int timeSinceEpoch = 0;
@@ -66,7 +66,7 @@ void sendPing() {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
   root["type"] = "ping";
-  root["id"] = pingId++;
+  root["id"] = ++pingId;
   String json;
   root.printTo(json);
   Serial.printf("[WebSocket] Sending ping: %1u\n", pingId);
@@ -190,6 +190,17 @@ void slackLoop() {
   }
 }
 
+void stopAnimation() {
+  // Halt any running animations.
+  animations.StopAnimation(0);
+
+  // Wait 5ms to let async LED tasks finish.
+  delay(5);
+
+  // Set all LEDs to off.
+  strip.ClearTo(RgbColor(0));
+}
+
 void setup() {
   Serial.begin(57600);
   Serial.setDebugOutput(true);
@@ -209,9 +220,7 @@ void setup() {
   }
 
   // Turn off the lights.
-  animations.StopAnimation(0);
-  strip.ClearTo(RgbColor(0));
-  strip.Show();
+  stopAnimation();
 
   configTime(HOURS_FROM_UTC  * 3600, 0, "pool.ntp.org", "time.nist.gov");
 }
@@ -226,9 +235,6 @@ void loop() {
 
   // Check to see if an alarm has expired.
   if (millis() - alarmEpoch > ALARM_DURATION) {
-    // Turn off the lights.
-    animations.StopAnimation(0);
-    strip.ClearTo(RgbColor(0));
-    strip.Show();
+    stopAnimation();
   }
 }
