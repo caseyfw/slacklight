@@ -205,22 +205,24 @@ void setup() {
   Serial.begin(57600);
   Serial.setDebugOutput(true);
 
-  // Fire up the LEDs and kick off the rainbow animation.
+  // Fire up the LEDs and display amber while connection is being established.
   strip.Begin();
-  animations.StartAnimation(0, ALARM_PERIOD, rainbowLoop);
+  strip.ClearTo(HslColor(0.06, 1.0, 0.05));
+  strip.Show();
 
   WiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
   while (WiFiMulti.run() != WL_CONNECTED) {
-    // Call wifi.run every 500ms, but update animations every 10ms.
-    for(int i = 0; i < 50; i++) {
-      animations.UpdateAnimations();
-      strip.Show();
-      delay(10);
-    }
+    delay(500);
   }
 
+  // Display green for one second to confirm connection.
+  strip.ClearTo(HslColor(0.35, 1.0, 0.05 ));
+  strip.Show();
+  delay(1000);
+
   // Turn off the lights.
-  stopAnimation();
+  strip.ClearTo(RgbColor(0));
+  strip.Show();
 
   configTime(HOURS_FROM_UTC  * 3600, 0, "pool.ntp.org", "time.nist.gov");
 }
