@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module fritzingVersion="0.9.3b" moduleId="WeMos_D1_mini_silkscreen_only">
+ <version>3</version>
+ <author>Mike Causer</author>
+ <title>WeMos D1 Mini Silkscreen Only</title>
+ <label>WeMos D1 Mini</label>
+ <date>Wed Dec 7 2016</date>
+ <url>http://wemos.cc</url>
+ <tags>
+  <tag>Microcontroller</tag>
+  <tag>ESP-8266</tag>
+  <tag>WiFi</tag>
+ </tags>
+ <properties>
+  <property name="family">WeMos D1 Mini</property>
+  <property name="variant">variant 1</property>
+  <property name="cpu">ESP-8266EX</property>
+  <property name="headers">silkscreen only</property>
+ </properties>
+ <description>The D1 mini is a mini wifi board based on ESP-8266EX.</description>
+ <views>
+  <iconView>
+   <layers image="breadboard/WeMos-D1-mini-male-headers-below_breadboard.svg">
+    <layer layerId="icon"/>
+   </layers>
+  </iconView>
+  <pcbView>
+   <layers image="pcb/WeMos-D1-mini-silkscreen_pcb.svg">
+    <layer layerId="silkscreen"/>
+   </layers>
+  </pcbView>
+ </views>
+</module>
