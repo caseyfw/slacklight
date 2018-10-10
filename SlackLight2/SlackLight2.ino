@@ -46,7 +46,9 @@ unsigned long lastPing = 0;
 unsigned long pingId = 0;
 bool connected = false;
 unsigned long alarmEpoch = 0;
-unsigned int timeSinceEpoch = 0;
+
+unsigned long bookingPeriod = 90000;
+unsigned long bookingEpoch = 0;
 
 // How bright the LEDs are. 0.5f is full stick and probably a bad idea.
 const float lightness = 0.3f;
@@ -63,12 +65,12 @@ NeoPixelAnimator animations(1);
  * the WebSocket connection, and then every 5 seconds to keep the connection alive.
  */
 void sendPing() {
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject& root = jsonBuffer.createObject();
+  DynamicJsonDocument jsonDocument;
+  JsonObject root = jsonDocument.to<JsonObject>();
   root["type"] = "ping";
   root["id"] = ++pingId;
   String json;
-  root.printTo(json);
+  serializeJson(jsonDocument, json);
   Serial.printf("[WebSocket] Sending ping: %1u\n", pingId);
   webSocket.sendTXT(json);
 }
@@ -201,14 +203,27 @@ void stopAnimation() {
   strip.ClearTo(RgbColor(0));
 }
 
+void bookingCheck() {
+  if (millis() > bookingEpoch) {
+    strip.ClearTo(HslColor(0.35, 1.0, 0.05 ));
+    strip.Show();
+    delay(200);
+    strip.ClearTo(RgbColor(0));
+    strip.Show();
+
+    // Reset bookingPeriod to some time in the future.
+    bookingEpoch = millis() + random(bookingPeriod);
+  }
+}
+
 void setup() {
   Serial.begin(57600);
   Serial.setDebugOutput(true);
 
   // Fire up the LEDs and display amber while connection is being established.
-  strip.Begin();
-  strip.ClearTo(HslColor(0.06, 1.0, 0.05));
-  strip.Show();
+  // strip.Begin();
+  // strip.ClearTo(HslColor(0.06, 1.0, 0.05));
+  // strip.Show();
 
   WiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
   while (WiFiMulti.run() != WL_CONNECTED) {
@@ -216,9 +231,9 @@ void setup() {
   }
 
   // Display green for one second to confirm connection.
-  strip.ClearTo(HslColor(0.35, 1.0, 0.05 ));
-  strip.Show();
-  delay(1000);
+  // strip.ClearTo(HslColor(0.35, 1.0, 0.05 ));
+  // strip.Show();
+  // delay(1000);
 
   // Turn off the lights.
   strip.ClearTo(RgbColor(0));
@@ -234,6 +249,8 @@ void loop() {
   strip.Show();
 
   slackLoop();
+
+  bookingCheck();
 
   // Check to see if an alarm has expired.
   if (millis() - alarmEpoch > ALARM_DURATION) {
