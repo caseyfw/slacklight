@@ -2,6 +2,8 @@
 
 An Arduino / ESP8266 based slack alert light. Perfect for when your build breaks.
 
+![Photo of SlackLight](https://i.imgur.com/bCNsTok.jpg)
+
 ## Getting started
 
 You'll need the Arduino IDE and a few additional libraries. This used to be a pain, but Arduino now has a board and library manager built in.
